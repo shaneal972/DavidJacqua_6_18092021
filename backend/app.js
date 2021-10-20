@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 const app = express();
 
 //Connection à la base de donnée MongoDb
-mongoose.connect('mongodb+srv://userP6:owPKVQSH9LT9YkgH@apiavisgastro.nesyz.mongodb.net/ApiAvisGastro?retryWrites=true&w=majority',
+mongoose.connect('mongodb+srv://USERNAME6:<PASSWORD>@apiavisgastro.nesyz.mongodb.net/YourDatabase?retryWrites=true&w=majority',
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
