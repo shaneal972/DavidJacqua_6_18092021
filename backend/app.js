@@ -1,11 +1,13 @@
-import express from 'express';
-import mongoose from 'mongoose';
+const express = require('express');
+const mongoose = require('mongoose');
+const path = require('path');
 
 // Création de l'application express
 const app = express();
 
+
 // import sauceRoutes from './routes/sauce.js';
-import userRoutes from './routes/user';
+const userRoutes = require('./routes/user');
 
 //Connection à la base de donnée MongoDb
 mongoose.connect('mongodb+srv://userP6:owPKVQSH9LT9YkgH@apiavisgastro.nesyz.mongodb.net/ApiAvisGastro?retryWrites=true&w=majority',
@@ -13,28 +15,18 @@ mongoose.connect('mongodb+srv://userP6:owPKVQSH9LT9YkgH@apiavisgastro.nesyz.mong
   useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch(() => console.log('Connexion à MongoDB échouée !'));
-  
 
+app.use(express.json());
+
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use((req, res, next) => {
-  console.log('Requête reçue !');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
   next();
 });
 
-app.use((req, res, next) => {
-  res.status(201);
-  next();
-});
+app.use('/api/auth', userRoutes);
 
-app.use((req, res, next) => {
-  res.json({ message: 'Votre requête a bien été reçue !' });
-  next();
-});
-
-app.use((req, res, next) => {
-  console.log('Réponse envoyée avec succès !');
-});
-
-app.use('api/user', userRoutes);
-
-export default app;
+module.exports = app;
