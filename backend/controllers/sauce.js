@@ -1,7 +1,4 @@
-const User = require('../models/User');
 const Sauce = require('../models/Sauce');
-
-
 
 /**
  * Permet de récupérer toutes les sauces de la bdd
@@ -83,35 +80,60 @@ exports.updateSauce = (req, res, next) => {
 exports.deleteSauce = (req, res, next) => {
     Sauce.deleteOne({ _id: req.params.id })
         .then(() => res.status(200).json({ message: 'Sauce supprimée avec succès !'}))
-        .catch(error => res.status(400).json({ error }));
+        .catch(error => res.status(400).json({ error: error.message }));
 }
 
 exports.likeSauce = (req, res, next) => {
-    Sauce.findByIdAndUpdate({ _id: req.params.id })
-        .then(sauce => {
-            console.log(sauce.userId);
-            const usersLiked = sauce.usersLiked;
-            const usersDisliked = sauce.usersDisliked;
-            let like;
-            if (usersLiked.length > 0) {
-                if (usersLiked.includes(sauce.userId)) {
-                    like = 0;
-                    sauce.likes -= 1;
-                } else {
-                    like = 1;
-                    sauce.likes += 1;
-                    usersLiked.push(sauce.userId);
-                }
-            }
-            if (usersDisliked.length > 0) {
-                if (usersDisliked.includes(sauce.userId)) {
-                    like = -1;
-                } else {
-                    usersDisliked.push(sauce.userId);
-                    sauce.dislikes += 1;
-                }
-            }
+    console.log(req.body);
+    let usersLiked = [];
+    Sauce.findOne({ _id: req.params.id }, {}, (err, docs) => {
+        usersLiked = docs.usersLiked;
+        usersDisLiked = docs.usersDisLiked;
 
-        })
+        switch (req.body.like) {
+            case 1:
+                console.log('cas 1');
+                Sauce.updateOne({ _id: req.params.id }, {
+                    $inc: { likes: 1 }, // Incrémentation du nombres de likes
+                    $push: { usersLiked: req.body.userId } // Ajout de l'userId dans le tableau de likes
+                })
+                    .then(() => res.status(201).json({ message: "Vous aimez cette sauce" }))
+                    .catch((error) => res.status(400).json({ message: "Erreur mongoose", error: error.message }))
+                break;
+            case 0:
+                console.log('cas 0');
+                
+                console.log('usersLiked', usersLiked);
+                if (usersLiked.includes(req.body.userId)) {
+                    Sauce.updateOne({ _id: req.params.id }, {
+                        $inc: { likes: -1 }, // Décrémentation du nombres de likes
+                        $pull: { usersLiked: req.body.userId } // Suppression de l'userId dans le tableau de likes
+                    })
+                        .then(() => res.status(201).json({ message: "Vous n'aimez plus cette sauce" }))
+                        .catch((error) => res.status(400).json({ message: "Erreur mongoose", error: error.message }))
+                } else {
+                    Sauce.updateOne({ _id: req.params.id }, {
+                        $inc: { dislikes: -1 }, // Décrémentation du nombres de likes
+                        $pull: { usersDisLiked: req.body.userId } // Suppression de l'userId dans le tableau de likes
+                    })
+                        .then(() => res.status(201).json({ message: "Vous ne détestez plus cette sauce" }))
+                        .catch((error) => res.status(400).json({ message: "Erreur mongoose", error: error.message }))
+                  
+                };
+                break;
+            case -1:
+                console.log('cas -1');
+                Sauce.updateOne({ _id: req.params.id }, {
+                    $inc: { dislikes: 1 }, // Incrémentation du nombres de dislikes
+                    $push: { usersDisLiked: req.body.userId } // Ajout de l'userId dans le tableau de likes
+                })
+                    .then(() => res.status(201).json({ message: "Vous détestez cette sauce" }))
+                    .catch((error) => res.status(400).json({ message: "Erreur mongoose", error: error.message }))
+                break;
+        };
 
-}
+        if (err) {
+            console.log(err.message);
+        };
+    });    
+};

@@ -1,10 +1,23 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 
 // Création de l'application express
 const app = express();
 
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // Chaque adresse IP est limitée à 100 requêtes par fenêtre.
+});
+
+// Sécurisation de quelques failles de sécurité
+app.use(helmet());
+
+// Sécurisation de l'attaque brute-force
+app.use(limiter);
 
 const sauceRoutes = require('./routes/sauce');
 const userRoutes = require('./routes/user');
