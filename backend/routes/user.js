@@ -2,7 +2,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const userController = require('../controllers/user');
 const { check, validationResult } = require('express-validator');
-const validator = require('../middleware/validator/user');
 
 const router = express.Router();
 const urlencodeParser = bodyParser.urlencoded({ extended: false });
@@ -19,7 +18,7 @@ router.post('/signup',
     ], (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(422).jsonp(errors.array());
+            return res.status(422).json(errors.array());
         } else {
             next();
         }
