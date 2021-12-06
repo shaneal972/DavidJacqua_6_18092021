@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { check, validationResult } = require('express-validator');
 const sauceController = require('../controllers/sauce');
+const { check, validationResult } = require('express-validator');
 const validate = require('../middleware/validator/sauces');
 
 const router = express.Router();
@@ -15,10 +15,10 @@ const fs = require('fs');
 const urlencodeParser = bodyParser.urlencoded({ extended: false });
 
 router.post('/sauces',
-    urlencodeParser,
-    validate.saucesCheck,
     auth,
     multer,
+    urlencodeParser,
+    validate.saucesCheck,
     sauceController.createSauce
 );
 router.get('/sauces', auth, sauceController.getSauces);
