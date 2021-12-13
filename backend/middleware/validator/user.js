@@ -1,6 +1,8 @@
 const { check, validationResult } = require("express-validator");
 
-
+/**
+ * Permet la validation d'un utilisateur coté backend lors de sa création 
+ */
 exports.userSignUp = [
         check('email', "L'email n'est pas valide")
             .isEmail(),

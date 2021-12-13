@@ -83,16 +83,22 @@ exports.deleteSauce = (req, res, next) => {
         .catch(error => res.status(400).json({ error: error.message }));
 }
 
+/**
+ * Permet de liker ou disliker une sauce
+ * @param {Request} req 
+ * @param {Response} res 
+ * @param next 
+ */
 exports.likeSauce = (req, res, next) => {
-    console.log(req.body);
     let usersLiked = [];
+    let usersDisLiked = [];
+    // Récupération de la sauce
     Sauce.findOne({ _id: req.params.id }, {}, (err, docs) => {
         usersLiked = docs.usersLiked;
         usersDisLiked = docs.usersDisLiked;
 
         switch (req.body.like) {
             case 1:
-                console.log('cas 1');
                 Sauce.updateOne({ _id: req.params.id }, {
                     $inc: { likes: 1 }, // Incrémentation du nombres de likes
                     $push: { usersLiked: req.body.userId } // Ajout de l'userId dans le tableau de likes
@@ -101,9 +107,6 @@ exports.likeSauce = (req, res, next) => {
                     .catch((error) => res.status(400).json({ message: "Erreur mongoose", error: error.message }))
                 break;
             case 0:
-                console.log('cas 0');
-                
-                console.log('usersLiked', usersLiked);
                 if (usersLiked.includes(req.body.userId)) {
                     Sauce.updateOne({ _id: req.params.id }, {
                         $inc: { likes: -1 }, // Décrémentation du nombres de likes
@@ -122,7 +125,6 @@ exports.likeSauce = (req, res, next) => {
                 };
                 break;
             case -1:
-                console.log('cas -1');
                 Sauce.updateOne({ _id: req.params.id }, {
                     $inc: { dislikes: 1 }, // Incrémentation du nombres de dislikes
                     $push: { usersDisLiked: req.body.userId } // Ajout de l'userId dans le tableau de likes

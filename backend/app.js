@@ -7,7 +7,7 @@ const rateLimit = require("express-rate-limit");
 // Création de l'application express
 const app = express();
 
-
+// Configuration d'un limiter 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100 // Chaque adresse IP est limitée à 100 requêtes par fenêtre.

@@ -1,6 +1,8 @@
 const { check, validationResult } = require("express-validator");
 
-
+/**
+ * Permet la validation d'un sauce niveau backend
+ */
 exports.saucesCheck = [
     check('name')
         .isLength({ min: 5 }).withMessage('name should be more than 5 characters'),
