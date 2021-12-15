@@ -1,4 +1,6 @@
 const Sauce = require('../models/Sauce');
+const fs = require('fs');
+const path = require('path');
 
 /**
  * Permet de récupérer toutes les sauces de la bdd
@@ -66,9 +68,32 @@ exports.getOneSauce = (req, res, next) => {
  * @param next
  */
 exports.updateSauce = (req, res, next) => {
-    Sauce.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
+    if (req.file) {
+        Sauce.findOne({ id: req.params.id })
+            .then((data) => {
+                //Récupération du filename de la photo à supprimer dans la bdd
+                const filename = data.imageUrl.split("/images")[1];
+                //Suppression de l'image dans le dossier du serveur
+                // fs.unlink(`/images/${filename}`, (err) => {
+                //     if (err) throw err;
+                // });
+
+            })
+        .catch((error) => res.status(404).json({error}))
+    }
+
+    //Mettre à jour la sauce dans la bdd
+    const sauceObject = req.file ?
+    {
+        ...JSON.parse(req.body.sauce),
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+    } : {
+        ...req.body
+        };
+    
+    Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
         .then(() => res.status(200).json({ message: 'Sauce modifiée avec succès!'}))
-        .catch(error => res.status(400).json({ error }));
+        .catch(error => res.status(404).json({ error }));
 };
 
 /**
