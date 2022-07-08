@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const path = require('path');
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
+const crossdomain = require('helmet-crossdomain');
 
 // Création de l'application express
 const app = express();
@@ -15,6 +16,10 @@ const limiter = rateLimit({
 
 // Sécurisation de quelques failles de sécurité
 app.use(helmet());
+
+// Sets X-Permitted-Cross-Domain-Policies: none
+// app.use(crossdomain());
+app.use(crossdomain({ permittedPolicies: 'all' }));
 
 // Sécurisation de l'attaque brute-force
 app.use(limiter);
